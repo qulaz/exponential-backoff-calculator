@@ -13,6 +13,7 @@ export default class BackoffCalculator extends React.Component {
       interval_sec: 1,
       max_retries: 5,
       exponential: 1,
+      maxDelay: 0,
       runNumber: [],
       runSecond: [],
       runTimestamp: [],
@@ -45,6 +46,7 @@ export default class BackoffCalculator extends React.Component {
     let interval_sec = parseFloat(this.state.interval_sec);
     let max_retries = parseFloat(this.state.max_retries);
     let exponential = parseFloat(this.state.exponential);
+    let maxDelay = parseFloat(this.state.maxDelay);
     let currentDate = new Date(this.date.getTime());
     let newRunNumber = [];
     let newRunSecond = [];
@@ -63,7 +65,11 @@ export default class BackoffCalculator extends React.Component {
       newRunSecond.push(secsFloat.toFixed(3));
       newRunTimestamp.push(timeString);
 
-      secsFloat += interval_sec * Math.pow(exponential, i);
+      let nextDelay = interval_sec * Math.pow(exponential, i);
+      if (maxDelay > 0 && nextDelay > maxDelay) {
+        nextDelay = maxDelay
+      }
+      secsFloat += maxDelay;
     }
 
     this.setState({
@@ -189,6 +195,24 @@ export default class BackoffCalculator extends React.Component {
                             type="number"
                             step="0.1"
                             value={this.state.exponential}
+                            onChange={this.handleChange}
+                          />
+                          <br />
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col>
+                          <label style={{ float: 'left' }}>Max Delay:</label>
+                          <input
+                            style={{
+                              float: 'right',
+                              paddingLeft: '5px',
+                              borderColor: 'black',
+                            }}
+                            name="maxDelay"
+                            type="number"
+                            step="0.1"
+                            value={this.state.maxDelay}
                             onChange={this.handleChange}
                           />
                           <br />
